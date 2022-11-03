@@ -7,7 +7,8 @@ public class ObstacleSpawner : MonoBehaviour
     public enum ObstacleType
     {
         Game,
-        Movie
+        Movie,
+        Sleep
     };
     private enum PositionSpawn
     {
@@ -17,10 +18,12 @@ public class ObstacleSpawner : MonoBehaviour
     };
     public GameObject game, movie;
     public GameObject RespawnObstacle_Left, RespawnObstacle_Right, RespawnObstacle_Center;
-    public float interval = 2f;
+    private float startInterval = 0.8f;
+    private float interval;
     // Start is called before the first frame update
     void Start()
     {
+        interval = startInterval;
         GameInstance.onQuizStart += GameInstance_onQuizStart;
         GameInstance.onQuizSpawn += Gameinstance_onQuizSpawn;
         GameInstance.onQuizAnswer += QuizAnswer;
@@ -28,12 +31,20 @@ public class ObstacleSpawner : MonoBehaviour
         GameInstance.onGameOver += onGameOver;
         GameInstance.onFinishHit += onGameFinish;
         GameInstance.onResetGame += onReset;
+        GameInstance.onStart += onReset;
         StartCoroutine(Spawner());
     }
 
     private void onReset()
     {
         this.stopSpawn = false;
+        this.interval = startInterval;
+        this.obstacles.ForEach(obstacle =>
+        {
+            if (obstacle.gameObject != null)
+                Destroy(obstacle.gameObject);
+        });
+        this.obstacles.Clear();
     }
 
     private void onGameFinish()
@@ -56,6 +67,7 @@ public class ObstacleSpawner : MonoBehaviour
     private void QuizAnswer(CanvasQuiz.AnswerType obj)
     {
         stopSpawn = false;
+        interval = startInterval / (GameInstance.speedScale);
     }
 
     private void Gameinstance_onQuizSpawn()
@@ -63,7 +75,7 @@ public class ObstacleSpawner : MonoBehaviour
         stopSpawn = true;
     }
 
-    private bool stopSpawn = false;
+    private bool stopSpawn = true;
     private void GameInstance_onQuizStart()
     {
         stopSpawn = true;
@@ -74,7 +86,7 @@ public class ObstacleSpawner : MonoBehaviour
         {
             yield return new WaitForSeconds(interval);
             if (stopSpawn) continue;
-            var obstacleType = (ObstacleType)Random.Range(0, 2);
+            var obstacleType = (ObstacleType)Random.Range(0, 3);
             var position = (PositionSpawn)Random.Range(0, 3);
             SpawnObject(obstacleType, position);
         }
@@ -99,17 +111,27 @@ public class ObstacleSpawner : MonoBehaviour
         };
         switch (obstacle)
         {
+
             case ObstacleType.Game:
-                Instantiate(game, tr.position, tr.rotation);
+                var go = Instantiate(game, tr.position, tr.rotation);
+                obstacles.Add(go);
                 break;
             case ObstacleType.Movie:
-                Instantiate(movie, tr.position, tr.rotation);
+                var goM = Instantiate(movie, tr.position, tr.rotation);
+                obstacles.Add(goM);
+                break;
+            case ObstacleType.Sleep:
+                var goS = Instantiate(sleep, tr.position, tr.rotation);
+                obstacles.Add(goS);
                 break;
             default:
                 break;
         }
 
     }
+    List<GameObject> obstacles = new List<GameObject>();
+    public GameObject sleep;
+
     // Update is called once per frame
     void Update()
     {

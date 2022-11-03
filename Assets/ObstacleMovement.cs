@@ -6,9 +6,9 @@ using static ObstacleSpawner;
 
 public class ObstacleMovement : MonoBehaviour
 {
-    public int degreeDirection = 25;
+    private int degreeDirection = 30;
     float timeElapsed = 0;
-    public float duration = 3.5f;
+    private float duration ;
     public int length = 30;
     private Vector3 startPosition;
     private Vector3 endPosition;
@@ -17,7 +17,7 @@ public class ObstacleMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        duration = length / GameInstance.speed;
         this.startPosition = transform.position;
         this.endPosition = new Vector3();
         endPosition.x = this.startPosition.x - Mathf.Cos(Mathf.Deg2Rad * degreeDirection) * length;
@@ -25,7 +25,7 @@ public class ObstacleMovement : MonoBehaviour
         endPosition.z = 0;
         GameInstance.onQuizDone += GameInstance_onQuizDone;
         GameInstance.onQuizStart += GameInstance_onQuizStart;
-        GameInstance.onQuizSpawn += GameInstance_onQuizSpawn; 
+        GameInstance.onQuizSpawn += GameInstance_onQuizSpawn;
         GameInstance.onQuizAnswer += QuizAnswer;
         GameInstance.onGameOver += onGameOver;
         GameInstance.onFinishHit += onGameFinish;
@@ -37,8 +37,9 @@ public class ObstacleMovement : MonoBehaviour
     {
         //stopMovement = false;
         stopMovement = false;
-        this.gameObject.SetActive(false);
-        Destroy(this.gameObject);
+        Debug.Log("GAME OBJECT OBSTACLE DESTROYED...");
+        Destroy(gameObject);
+        //this.gameObject.SetActive(false);
     }
 
     private void onGameFinish()
@@ -46,14 +47,19 @@ public class ObstacleMovement : MonoBehaviour
         //throw new NotImplementedException();
         stopMovement = true;
     }
-
+    private bool gameOver = false;
     private void onGameOver()
     {
+        //GameInstance.onQuizAnswer = QuizAnswer;
+        gameOver = true;
+        Debug.Log("on game over!");
         stopMovement = true;
     }
 
     private void QuizAnswer(CanvasQuiz.AnswerType obj)
     {
+        Debug.Log("on quiz answer!");
+        if (gameOver) return;
         stopMovement = false;
     }
 
@@ -72,7 +78,7 @@ public class ObstacleMovement : MonoBehaviour
         stopMovement = false;
     }
 
-
+    float timeElapsedAnim = 0f;
     // Update is called once per frame
     void Update()
     {
@@ -81,7 +87,7 @@ public class ObstacleMovement : MonoBehaviour
         {
             var valueToLerp = Vector3.Lerp(this.startPosition, this.endPosition, timeElapsed / duration);
             transform.position = valueToLerp;
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.deltaTime * GameInstance.speedScale;
         }
         else
         {

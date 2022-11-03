@@ -7,13 +7,15 @@ public class FinishMovement : MonoBehaviour
 {
     public int degreeDirection = 25;
     float timeElapsed = 0;
-    public float duration = 4.5f ;
-    private int length = 50;
-    private Vector3 startPosition = new Vector3(29.84876f, -3.60037f, 3.270748f);
+    private float duration;
+    private int length = 30;
+    private Vector3 startPosition;
     private Vector3 endPosition;
     // Start is called before the first frame update
     void Start()
     {
+        duration = length / GameInstance.speed;
+        this.startPosition = transform.position;
         GameInstance.onGameOver += onGameOver;
         GameInstance.SpawnFinish += spawn;
         GameInstance.onResetGame += onReset;
@@ -40,7 +42,8 @@ public class FinishMovement : MonoBehaviour
 
     void InitPositions()
     {
-        this.startPosition = new Vector3(29.84876f, -3.60037f, 3.270748f);
+        //this.startPosition = new Vector3(29.84876f, -3.60037f, 3.270748f);
+        
         this.endPosition = new Vector3();
         this.transform.position = startPosition;
         endPosition.x = this.startPosition.x - Mathf.Cos(Mathf.Deg2Rad * degreeDirection) * length;
@@ -75,14 +78,14 @@ public class FinishMovement : MonoBehaviour
     }
     private bool stopMoving = true;
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (stopMoving) return;
         if (timeElapsed < duration)
         {
             var valueToLerp = Vector3.Lerp(this.startPosition, this.endPosition, timeElapsed / duration);
             transform.position = valueToLerp;
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.deltaTime * GameInstance.speedScale;
         }
         else
         {

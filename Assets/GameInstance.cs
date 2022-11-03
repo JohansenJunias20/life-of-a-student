@@ -6,8 +6,15 @@ using static CanvasQuiz;
 
 public class GameInstance : MonoBehaviour
 {
+    public static Action onStart { get; set; }
+    public static Action onHTPOpen { get; set; }
     public static Action onResetGame { get; set; }
     public static int score;
+    public static int indexQuiz = -1;
+    // ini constant tidak bisa dirubah, untuk merubah speed pakai speedScale
+    public static float speed = 8f;
+    //value between 0-1 tujuannya untuk merubah speed sewaktu2
+    public static float speedScale = 1f;
     //perintah untuk ngespawn Finish, dipanggil di QuizMovement, dilisten di FinishSpawner
     public static Action SpawnFinish { get; set; }
     //saat finish Game Object hit ke character, dipanggil di FinishMovement, dilisten 

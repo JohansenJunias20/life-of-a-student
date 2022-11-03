@@ -5,16 +5,17 @@ using UnityEngine;
 
 public class QuizMovement : MonoBehaviour
 {
-    public int degreeDirection = 25;
+    private int degreeDirection = 30;
     float timeElapsed = 0;
-    public float duration ;
-    public int length = 30;
+    private float duration;
+    private int length = 30;
     private Vector3 startPosition = new Vector3(16f, -2.5f, 0f);
     private Vector3 endPosition;
     public GameObject CanvasQuiz;
     // Start is called before the first frame update
     void Start()
     {
+        duration = length / GameInstance.speed;
         GameInstance.onQuizSpawn += onQuizSpawn;
         GameInstance.onQuizAnswer += QuizAnswer;
         GameInstance.onGameOver += onGameOver;
@@ -88,7 +89,7 @@ public class QuizMovement : MonoBehaviour
         {
             var valueToLerp = Vector3.Lerp(this.startPosition, this.endPosition, timeElapsed / duration);
             transform.position = valueToLerp;
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.deltaTime * GameInstance.speedScale;
         }
         else
         {

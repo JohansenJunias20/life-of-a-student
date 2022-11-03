@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class CanvasQuiz : MonoBehaviour
 {
-    public int currentIndex = -1;
+    //public int GameInstance.indexQuiz = -1;
     public TextMeshProUGUI TMP_Answer1;
     public TextMeshProUGUI TMP_Answer2;
     public TextMeshProUGUI TMP_Answer3;
@@ -14,7 +14,7 @@ public class CanvasQuiz : MonoBehaviour
     public TextMeshProUGUI TMP_Timer;
     private void onReset()
     {
-        currentIndex = -1;
+        GameInstance.indexQuiz = -1;
         currentDuration = -1;
         timeout = false;
         this.gameObject.SetActive(false);
@@ -28,21 +28,66 @@ public class CanvasQuiz : MonoBehaviour
     };
     public List<IQuiz> quiz = new List<IQuiz>()
     {
-        new IQuiz() {
-            pertanyaan = "yang bukan merupakan perhitungan HPP",
-            jawaban = new string[] { "AVERAGE", "FIFO","STACK" } ,
-            answer=2}
-        ,
-        new IQuiz() {
-            pertanyaan = "yang bukan merupakan data structure",
-            jawaban=new string[] { "ARRAY" , "STACK","LOOP", },
+              new IQuiz()
+        {
+            pertanyaan = "Sifat-sifat yang dimiliki oleh seorang technopreneur, kecuali ? ",
+            jawaban = new string[3] { "smart", "logic", "creativity" },
+            answer = 1
+        }
+              ,
+        new IQuiz()
+        {
+            pertanyaan = "Skill yang dibutuhkan oleh seorang technopreneur, kecuali ? ",
+            jawaban = new string[3] { "teamwork", "leadership", "Self-interested" },
+            answer = 3
+        },
+        new IQuiz()
+        {
+            pertanyaan = "Perusahaan rintisan yang belum lama beroperasi adalah ? ",
+            jawaban = new string[3] { "UKM", "Start Up", "UMKM" },
             answer = 2
         },
         new IQuiz()
         {
-            pertanyaan ="yang merupakan bahasa pemrograman",
-            jawaban= new string[] { "C#", "HTML", "CSS"},
-            answer=0
+            pertanyaan = "Seorang yang berpikir 'Outside the box' adalah ?  ",
+            jawaban = new string[3] { "Entrepreneur", "Sociopreneur", "Technopreneur" },
+            answer = 3
+        },
+        new IQuiz()
+        {
+            pertanyaan = "Sebuah badan usaha yang memberikan pendanaan pada sebuah start-up adalah ?",
+            jawaban = new string[3] { "Angel Investor", "Bootstrap", "Venture Capital" },
+            answer = 3
+        },
+        new IQuiz()
+        {
+            pertanyaan = "Target pasar utama atau tujuan utama dari konsumen yang yang dituju merupakan arti dari ?",
+            jawaban = new string[3] { "Mass Market", "Target Market", "Niche Market" },
+            answer = 2
+        },
+        new IQuiz()
+        {
+            pertanyaan = "Industri dengan target pasar dan konsumen yang lebih spesifik merupakan arti dari ? ",
+            jawaban = new string[3] { "Mass Market", "Target Market", "Niche Market" },
+            answer = 3
+        },
+        new IQuiz()
+        {
+            pertanyaan = "Target pasar yang lebih luas tapi masih sesuai dengan segmen yang sudah ditetapkan sebelumnya merupakan arti dari ?  ",
+            jawaban = new string[3] { "Mass Market", "Target Market", "Niche Market" },
+            answer = 1
+        },
+        new IQuiz()
+        {
+            pertanyaan = "Yang tidak termasuk dalam segementasi pasar adalah ?  ",
+            jawaban = new string[3] { "Segemented Market", "Mass Market", "Target Market" },
+            answer = 3
+        },
+        new IQuiz()
+        {
+            pertanyaan = "Ciri-ciri dari Segmented Marketing, kecuali ?",
+            jawaban = new string[3] { "More income", "Adapt offer to best match segment", "Isolate broad segements comprising a market" },
+            answer = 1
         }
     };
     public enum AnswerType
@@ -56,12 +101,12 @@ public class CanvasQuiz : MonoBehaviour
     {
         if (timeout) return;
         answered = true;
-        if (currentIndex + 1 == quiz.Count)
+        if (GameInstance.indexQuiz + 1 == quiz.Count)
         {
             GameInstance.onLastQuizAnswered?.Invoke();
             Debug.Log("FINISHED!");
         }
-        if (index == quiz[currentIndex].answer)
+        if (index+1 == quiz[GameInstance.indexQuiz].answer)
         {
             //benar
             Debug.Log("BENAR!");
@@ -80,6 +125,8 @@ public class CanvasQuiz : MonoBehaviour
             //salah
             GameInstance.onQuizAnswer?.Invoke(AnswerType.Wrong);
         }
+        GameInstance.speedScale += 0.3f;
+        GameInstance.speedScale = Math.Min(GameInstance.speedScale, 2.5f);
         this.gameObject.SetActive(false);
     }
     // Start is called before the first frame update
@@ -103,7 +150,7 @@ public class CanvasQuiz : MonoBehaviour
         currentDuration -= Time.deltaTime;
         if (currentDuration <= 0)
         {
-            if (currentIndex + 1 == quiz.Count)
+            if (GameInstance.indexQuiz + 1 == quiz.Count)
             {
                 GameInstance.onLastQuizAnswered?.Invoke();
                 Debug.Log("FINISHED!");
@@ -119,10 +166,10 @@ public class CanvasQuiz : MonoBehaviour
     {
         answered = false;
         timeout = false;
-        currentIndex++;
+        GameInstance.indexQuiz++;
         Debug.Log("nextquiz called, CURRENT INDEX:");
-        Debug.Log(currentIndex);
-        var currentQuiz = quiz[currentIndex];
+        Debug.Log(GameInstance.indexQuiz);
+        var currentQuiz = quiz[GameInstance.indexQuiz];
 
         TMP_Answer1.text = currentQuiz.jawaban[0];
         TMP_Answer2.text = currentQuiz.jawaban[1];

@@ -17,9 +17,10 @@ public class CanvasQuizSpawner : MonoBehaviour
 
     private void onReset()
     {
+        //GO_CanvasQuiz.GetComponent<CanvasQuiz>().currentIndex = -1;
+        GameInstance.indexQuiz = -1;
         GO_CanvasQuiz.SetActive(false);
         //because inside canvasquiz.cs cannot assign itself due inactive gameobject
-        GO_CanvasQuiz.GetComponent<CanvasQuiz>().currentIndex = -1;
     }
     
     private void QuizStart()

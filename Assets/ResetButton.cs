@@ -15,7 +15,13 @@ public class ResetButton : MonoBehaviour
         {
             gameOver.SetActive(false);
         }
+        GameInstance.speedScale = 1f;
+        GameInstance.speed = 8f;
+        GameInstance.indexQuiz = -1;
+        Debug.Log("speed scale set to:");
+        Debug.Log(GameInstance.speedScale);
         GameInstance.onResetGame?.Invoke();
+
     }
     // Update is called once per frame
     void Update()
