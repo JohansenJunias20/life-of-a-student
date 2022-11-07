@@ -9,7 +9,7 @@ public class QuizMovement : MonoBehaviour
     float timeElapsed = 0;
     private float duration;
     private int length = 30;
-    private Vector3 startPosition = new Vector3(16f, -2.5f, 0f);
+    private Vector3 startPosition = new Vector3(6.22f, -0.24f, 0);
     private Vector3 endPosition;
     public GameObject CanvasQuiz;
     // Start is called before the first frame update
@@ -42,13 +42,14 @@ public class QuizMovement : MonoBehaviour
 
     void InitPositions()
     {
-        this.startPosition = new Vector3(16f, -2.5f, 0f);
+        this.startPosition = new Vector3(6.22f, -0.24f, 0);
         this.endPosition = new Vector3();
         this.transform.position = startPosition;
         endPosition.x = this.startPosition.x - Mathf.Cos(Mathf.Deg2Rad * degreeDirection) * length;
         endPosition.y = this.startPosition.y - Mathf.Sin(Mathf.Deg2Rad * degreeDirection) * length;
         endPosition.z = 0;
         this.timeElapsed = 0;
+        //this.gameObject.GetComponent<SpriteRenderer>()
     }
     private void QuizAnswer(CanvasQuiz.AnswerType obj)
     {

@@ -57,7 +57,28 @@ public class CharacterMovement : MonoBehaviour
         if (result == null) return;
         Destroy(other.gameObject);
         GameInstance.ReduceHealth?.Invoke(result.damage);
+        StartCoroutine(Blinking());
     }
+    bool blinking = false;
+    IEnumerator Blinking()
+    {
+        //if (blinking) yield break;
+        //blinking = true;
+        var i = 0;
+        //throw new System.NotImplementedException();
+        while (true)
+        {
+            if (i == 3) break;
+            this.GetComponent<SpriteRenderer>().color = Color.red;
+            yield return new WaitForSeconds(0.25f);
+            this.GetComponent<SpriteRenderer>().color = Color.white;
+            yield return new WaitForSeconds(0.25f);
+            Debug.Log("blingking!");
+            i++;
+        }
+        //blinking = false;
+    }
+
     bool stopMovement = true;
     // Update is called once per frame
     void Update()
