@@ -26,7 +26,7 @@ public class ObstacleSpawner : MonoBehaviour
         interval = startInterval;
         GameInstance.onQuizStart += GameInstance_onQuizStart;
         GameInstance.onQuizSpawn += Gameinstance_onQuizSpawn;
-        GameInstance.onQuizAnswer += QuizAnswer;
+        GameInstance.onFeedbackAnswerDone += onFeedbackAnswerDone;
         GameInstance.SpawnFinish += onSpawnFinishLine;
         GameInstance.onGameOver += onGameOver;
         GameInstance.onFinishHit += onGameFinish;
@@ -64,7 +64,7 @@ public class ObstacleSpawner : MonoBehaviour
         this.stopSpawn = true;
     }
 
-    private void QuizAnswer(CanvasQuiz.AnswerType obj)
+    private void onFeedbackAnswerDone()
     {
         stopSpawn = false;
         interval = startInterval / (GameInstance.speedScale);

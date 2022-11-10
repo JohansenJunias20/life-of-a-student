@@ -9,11 +9,11 @@ public class CitySpawnerMovement : MonoBehaviour
     public Sprite bawah;
     private List<GameObject> Latas = new List<GameObject>();
     private List<GameObject> Lbawah = new List<GameObject>();
-    private Vector3 pAtas0 = new Vector3(3f, 7.949f, 0);
-    private Vector3 pAtas1 = new Vector3(28.5f, 23.370f, 0);
+    private Vector3 pAtas0 = new Vector3(5f, 7.949f, 0);
+    private Vector3 pAtas1 = new Vector3(30.5f, 22.370f, 0);
     //private Vector3 pBawah0 = new Vector3(5.63f, -4.17f, 0);
-    private Vector3 pBawah0 = new Vector3(11.63f, -4.17f, 0);
-    private Vector3 pBawah1 = new Vector3(35.92f, 11.02f, 0);
+    private Vector3 pBawah0 = new Vector3(5.63f, -4.17f, 0);
+    private Vector3 pBawah1 = new Vector3(28f, 9.02f, 0);
     //private Vector3 pBawah1 = new Vector3(35.92f, 11.02f, 0);
     private float degreeDirection = 30;
     private float movementSpeed;
@@ -28,33 +28,33 @@ public class CitySpawnerMovement : MonoBehaviour
         GameInstance.onFinishHit += StopTheMovement;
         GameInstance.onResetGame += StartTheMovement;
         GameInstance.onStart += StartTheMovement;
-        GameInstance.onQuizAnswer += (a) => { StartTheMovement(); };
+        GameInstance.onFeedbackAnswerDone += () => { StartTheMovement(); };
         GameObject go_atas_0 = new GameObject();
         var spriteRenderer = go_atas_0.AddComponent<SpriteRenderer>();
-        spriteRenderer.color = new Color(1f, 1f, 1f, 0.8f);
+        spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
         spriteRenderer.sortingOrder = -1;
         go_atas_0.transform.position = pAtas0;
         spriteRenderer.sprite = atas;
 
         GameObject go_atas_1 = new GameObject();
         var spriteRenderer1 = go_atas_1.AddComponent<SpriteRenderer>();
-        spriteRenderer1.color = new Color(1f, 1f, 1f, 0.8f);
+        spriteRenderer1.color = new Color(1f, 1f, 1f, 1f);
         spriteRenderer1.sortingOrder = -1;
         go_atas_1.transform.position = pAtas1;
         spriteRenderer1.sprite = atas;
 
         GameObject go_bawah_0 = new GameObject();
         var spriteRenderer2 = go_bawah_0.AddComponent<SpriteRenderer>();
-        spriteRenderer2.color = new Color(1f, 1f, 1f, 0.8f);
+        spriteRenderer2.color = new Color(1f, 1f, 1f, 1f);
         spriteRenderer2.sprite = bawah;
-        spriteRenderer2.sortingOrder = 1;
+        spriteRenderer2.sortingOrder = 2;
         go_bawah_0.transform.position = pBawah0;
 
         GameObject go_bawah_1 = new GameObject();
         var spriteRenderer3 = go_bawah_1.AddComponent<SpriteRenderer>();
         go_bawah_1.transform.position = pBawah1;
-        spriteRenderer3.color = new Color(1f, 1f, 1f, 0.8f);
-        spriteRenderer3.sortingOrder = 1;
+        spriteRenderer3.color = new Color(1f, 1f, 1f, 1f);
+        spriteRenderer3.sortingOrder = 2;
         spriteRenderer3.sprite = bawah;
 
         Latas.Add(go_atas_0);

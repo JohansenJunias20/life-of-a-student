@@ -17,11 +17,12 @@ public class QuizMovement : MonoBehaviour
     {
         duration = length / GameInstance.speed;
         GameInstance.onQuizSpawn += onQuizSpawn;
-        GameInstance.onQuizAnswer += QuizAnswer;
+        GameInstance.onFeedbackAnswerDone += FeedBackDone;
+        //GameInstance.onQuizAnswer += QuizAnswer;
         GameInstance.onGameOver += onGameOver;
         GameInstance.onResetGame += onReset;
 
-        this.startPosition = new Vector3(16f, -2.5f, 0f);
+        this.startPosition = transform.position;
         this.endPosition = new Vector3();
         this.transform.position = startPosition;
         endPosition.x = this.startPosition.x - Mathf.Cos(Mathf.Deg2Rad * degreeDirection) * length;
@@ -51,15 +52,21 @@ public class QuizMovement : MonoBehaviour
         this.timeElapsed = 0;
         //this.gameObject.GetComponent<SpriteRenderer>()
     }
-    private void QuizAnswer(CanvasQuiz.AnswerType obj)
+    private void FeedBackDone()
     {
-        GetComponent<BoxCollider2D>().enabled = false;
+        GetComponent<EdgeCollider2D>().enabled = false;
         stopMoving = false;
     }
 
     private void onQuizSpawn()
     {
         Debug.Log("Quiz spawning...");
+        //StartMove();
+        StartCoroutine(delaySpawn());
+    }
+    IEnumerator delaySpawn()
+    {
+        yield return new WaitForSeconds(1f);
         StartMove();
     }
     public void OnTriggerEnter2D(Collider2D collision)
@@ -78,7 +85,7 @@ public class QuizMovement : MonoBehaviour
     {
         //this.Start();
         InitPositions();
-        GetComponent<BoxCollider2D>().enabled = true;
+        GetComponent<EdgeCollider2D>().enabled = true;
         stopMoving = false;
     }
     private bool stopMoving = true;

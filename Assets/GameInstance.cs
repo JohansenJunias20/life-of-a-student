@@ -9,6 +9,7 @@ public class GameInstance : MonoBehaviour
     public static Action onStart { get; set; }
     public static Action onHTPOpen { get; set; }
     public static Action onResetGame { get; set; }
+    public static Action onFeedbackAnswerDone { get; set; }
     public static int score;
     public static int indexQuiz = -1;
     // ini constant tidak bisa dirubah, untuk merubah speed pakai speedScale

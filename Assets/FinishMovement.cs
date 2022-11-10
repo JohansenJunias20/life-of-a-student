@@ -36,7 +36,7 @@ public class FinishMovement : MonoBehaviour
     private void onGameOver()
     {
         InitPositions();
-        GetComponent<BoxCollider2D>().enabled = true;
+        GetComponent<EdgeCollider2D>().enabled = true;
         timeElapsed = 0;
     }
 
@@ -71,7 +71,7 @@ public class FinishMovement : MonoBehaviour
     {
         //this.Start();
         InitPositions();
-        GetComponent<BoxCollider2D>().enabled = true;
+        GetComponent<EdgeCollider2D>().enabled = true;
         timeElapsed = 0;
         stopMoving = false;
         Debug.Log("startmove called!");

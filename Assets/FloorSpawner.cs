@@ -18,7 +18,7 @@ public class FloorSpawner : MonoBehaviour
     {
         movementSpeed = GameInstance.speed;
         GameInstance.onQuizStart += StopTheMovement;
-        GameInstance.onQuizAnswer += delegate (AnswerType w)
+        GameInstance.onFeedbackAnswerDone += delegate ()
         {
             StartTheMovement();
         };
@@ -46,7 +46,7 @@ public class FloorSpawner : MonoBehaviour
         temp.Add(go);
 
         nextFloorPlace = new Vector2();
-        var distance = 3f * 1.5f;
+        var distance = 3f;
         nextFloorPlace.x = Mathf.Sin(Mathf.Deg2Rad * 60) * distance;
         nextFloorPlace.y = Mathf.Cos(Mathf.Deg2Rad * 60) * distance;
         //nextFloorPlace.y = (4f / Mathf.Sin(Mathf.Deg2Rad * (sizeFloor.y / 2f))) * Mathf.Sin(Mathf.Deg2Rad * degreeDirectionMovement);

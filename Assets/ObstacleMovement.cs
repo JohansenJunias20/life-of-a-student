@@ -26,7 +26,7 @@ public class ObstacleMovement : MonoBehaviour
         GameInstance.onQuizDone += GameInstance_onQuizDone;
         GameInstance.onQuizStart += GameInstance_onQuizStart;
         GameInstance.onQuizSpawn += GameInstance_onQuizSpawn;
-        GameInstance.onQuizAnswer += QuizAnswer;
+        GameInstance.onFeedbackAnswerDone += FeedbackAnswerDone;
         GameInstance.onGameOver += onGameOver;
         GameInstance.onFinishHit += onGameFinish;
         GameInstance.onResetGame += onReset;
@@ -56,7 +56,7 @@ public class ObstacleMovement : MonoBehaviour
         stopMovement = true;
     }
 
-    private void QuizAnswer(CanvasQuiz.AnswerType obj)
+    private void FeedbackAnswerDone()
     {
         Debug.Log("on quiz answer!");
         if (gameOver) return;

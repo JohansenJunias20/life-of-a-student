@@ -23,7 +23,7 @@ public class CharacterMovement : MonoBehaviour
             animator.SetBool("Running", true);
             stopMovement = false;
         };
-        GameInstance.onQuizAnswer += delegate (AnswerType answer)
+        GameInstance.onFeedbackAnswerDone += delegate ()
         {
             animator.SetBool("Running", true);
             stopMovement = false;

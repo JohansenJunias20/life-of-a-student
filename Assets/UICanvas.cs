@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,13 +10,20 @@ public class UICanvas : MonoBehaviour
     public TMPro.TextMeshProUGUI textScore;
     public Slider healthBar;
     public Slider ShadowBar;
+    public GameObject ShadowFill;
     public GameObject fillHealthBar;
     public float health = 100f;
+    public GameObject GO_healthText ;
+    public GameObject GO_healthTextShadow;
+    public Sprite shadowHealthRed, shadowHealthGreen, healthRed;
     public GameObject Quiz;
     private int score = 0;
+    private Sprite OriFillHealth;
     // Start is called before the first frame update
     void Start()
     {
+        OriFillHealth = fillHealthBar.GetComponent<Image>().sprite;
+        GameInstance.onFeedbackAnswerDone += FeedbackAnswerDone;
         GameInstance.onQuizAnswer += QuizAnswer;
         GameInstance.onQuizStart += onQuizStart;
         GameInstance.ReduceHealth += onReduceHealth;
@@ -30,6 +38,12 @@ public class UICanvas : MonoBehaviour
         this.on75m += UICanvas_on75m;
         //Debug.Log(text);
     }
+
+    private void FeedbackAnswerDone()
+    {
+        pauseScore = false;
+    }
+
     private void onStart()
     {
         onReset();
@@ -75,6 +89,7 @@ public class UICanvas : MonoBehaviour
     private void onReduceHealth(float obj)
     {
         Debug.Log("reducing health...");
+        ShadowFill.GetComponent<Image>().sprite = shadowHealthRed;
         elapsedTime = 0;
         startShadowHelath = shadowHealth;
         startHealth = health;
@@ -89,7 +104,7 @@ public class UICanvas : MonoBehaviour
             pauseScore = true;
         }
         Debug.Log(finalHealth);
-        StartCoroutine(blinkingHP(new Color(255f / 255f, 97f / 255f, 97f / 255f)));
+        StartCoroutine(blinkingHP(ColorType.red));
         StartCoroutine(reduceShadowHealth());
         GameInstance.score = Convert.ToInt32(finalHealth);
 
@@ -102,15 +117,30 @@ public class UICanvas : MonoBehaviour
         finalShadowHealth = finalHealth;
         Debug.Log(finalHealth);
     }
-    IEnumerator blinkingHP(Color color)
+    public enum ColorType
+    {
+        green,
+        red
+    }
+    IEnumerator blinkingHP(ColorType color)
     {
         int i = 0;
         while (i != 5)
         {
             yield return new WaitForSeconds(0.2f);
-            fillHealthBar.GetComponent<Image>().color = color;
+            if (color == ColorType.green)
+            {
+                fillHealthBar.GetComponent<Image>().color = new Color(200/255f, 255/255f, 198/255f, 1f);
+
+            }
+            else
+            {
+                fillHealthBar.GetComponent<Image>().sprite = healthRed;
+                //fillHealthBar.GetComponent<Image>().color = new Color(0 / 255f, 0 / 255f, 0 / 255f, 0.2f);
+            }
             yield return new WaitForSeconds(0.2f);
-            fillHealthBar.GetComponent<Image>().color = new Color(255f / 255f, 194f / 255f, 47f / 255f);
+            fillHealthBar.GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
+            fillHealthBar.GetComponent<Image>().sprite = OriFillHealth;
             i++;
         }
     }
@@ -118,7 +148,6 @@ public class UICanvas : MonoBehaviour
     //IEnumerator
     private void QuizAnswer(CanvasQuiz.AnswerType obj)
     {
-        pauseScore = false;
         if (obj == CanvasQuiz.AnswerType.Correct)
         {
             //health += 10f;
@@ -129,7 +158,8 @@ public class UICanvas : MonoBehaviour
             finalShadowHealth = finalHealth;
             startShadowHelath = health;
             elapsedTimeShadow = 0;
-            StartCoroutine(blinkingHP(new Color(80f / 255f, 255f / 255f, 74f / 255f)));
+            ShadowFill.GetComponent<Image>().sprite = shadowHealthGreen;
+            StartCoroutine(blinkingHP(ColorType.green));
             //health = Mathf.Clamp(health, 0f, 100f);
             return;
         }
@@ -160,6 +190,8 @@ public class UICanvas : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        GO_healthText.GetComponent<TextMeshProUGUI>().text = $"{Convert.ToInt32(health)}";
+        GO_healthTextShadow.GetComponent<TextMeshProUGUI>().text = $"{Convert.ToInt32(health)}";
         healthBar.value = health / 100f;
         ShadowBar.value = shadowHealth / 100f;
         //Debug.Log("called");
@@ -170,7 +202,7 @@ public class UICanvas : MonoBehaviour
             elapsedTimeScore += Time.deltaTime * GameInstance.speedScale;
         }
         var finalScore = elapsedTimeScore * 5;
-        textScore.text = $"{Convert.ToInt32(finalScore)}M";
+        textScore.text = $"{Convert.ToInt32(finalScore)}";
         //Debug.Log("score updated");
         var temp = finalScore / 75;
         if (QuizCount != Convert.ToInt32(MathF.Floor(temp)))
