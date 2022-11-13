@@ -102,6 +102,7 @@ public class CanvasQuiz : MonoBehaviour
     private bool answered = false;
     public void Answer(int index)
     {
+        if (answered) return;
         if (timeout) return;
         answered = true;
         if (GameInstance.indexQuiz + 1 == quiz.Count)
@@ -259,6 +260,9 @@ public class CanvasQuiz : MonoBehaviour
         GO_Answer1.GetComponent<Image>().color = Color.white;
         GO_Answer2.GetComponent<Image>().color = Color.white;
         GO_answer3.GetComponent<Image>().color = Color.white;
+        GO_Box1.SetActive(false);
+        GO_Box2.SetActive(false);
+        GO_Box3.SetActive(false);
         Debug.Log(GameInstance.indexQuiz);
         var currentQuiz = quiz[GameInstance.indexQuiz];
         elapsedTimeTransition = 0f;
