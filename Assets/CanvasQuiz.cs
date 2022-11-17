@@ -224,7 +224,7 @@ public class CanvasQuiz : MonoBehaviour
         if (!startTimer) return;
         if (answered) return;
         currentDuration -= Time.deltaTime;
-        if (currentDuration <= 0)
+        if (currentDuration <= 0 && !timeout)
         {
             if (GameInstance.indexQuiz + 1 == quiz.Count)
             {
@@ -233,6 +233,7 @@ public class CanvasQuiz : MonoBehaviour
             }
             timeout = true;
             canvasTimeout.SetActive(true);
+            canvasTimeout.GetComponent<Animator>().Play("CanvasTimeout");
             StartCoroutine(delayFeedback());
             GameInstance.onQuizAnswer?.Invoke(AnswerType.Timeout);
             //this.gameObject.SetActive(false);
@@ -248,7 +249,7 @@ public class CanvasQuiz : MonoBehaviour
         {
             shakeTimer = false;
         }
-        TMP_Timer.text = Convert.ToInt32(currentDuration).ToString();
+        TMP_Timer.text = Convert.ToInt32(Math.Clamp(currentDuration, 0, 100)).ToString();
     }
 
     public void nextQuiz()
@@ -265,11 +266,7 @@ public class CanvasQuiz : MonoBehaviour
         GO_Box3.SetActive(false);
         Debug.Log(GameInstance.indexQuiz);
         var currentQuiz = quiz[GameInstance.indexQuiz];
-        elapsedTimeTransition = 0f;
-        oriScaleQuestionBoard = new Vector3(GO_QuestionBoard.transform.localScale.x, GO_QuestionBoard.transform.localScale.y, 0f);
-        GO_QuestionBoard.transform.localScale = new Vector3(0f, 0f, 0f);
         //GO_QuestionBoard.localScale = oriScaleQuestionBoard * 0f;
-        StartCoroutine(scalingTransition());
         TMP_Answer1.text = currentQuiz.jawaban[0];
         TMP_Answer2.text = currentQuiz.jawaban[1];
         TMP_Answer3.text = currentQuiz.jawaban[2];
@@ -291,24 +288,7 @@ public class CanvasQuiz : MonoBehaviour
         }
         transform.position = orignalPosition;
     }
-    IEnumerator scalingTransition()
-    {
-        //throw new NotImplementedException();
-        var duration = 0.2f;
-        Debug.Log(oriScaleQuestionBoard);
-        while (GO_QuestionBoard.transform.localScale.x != oriScaleQuestionBoard.x || oriScaleQuestionBoard.y != GO_QuestionBoard.transform.localScale.y)
-        {
-            elapsedTimeTransition += Time.deltaTime;
-            GO_QuestionBoard.transform.localScale = Vector3.Lerp(new Vector3(0f, 0f, 0f), oriScaleQuestionBoard, elapsedTimeTransition / duration);
-            yield return new WaitForEndOfFrame();
-            Debug.Log(oriScaleQuestionBoard);
-            Debug.Log(elapsedTimeTransition / duration);
-        }
-        Debug.Log(GO_QuestionBoard.transform.localScale);
-        Debug.Log(oriScaleQuestionBoard);
-        Debug.Log("size same!");
-
-    }
+  
     private bool shakeTimer = false;
     private float _currentDuration;
     private float currentDuration
@@ -325,8 +305,6 @@ public class CanvasQuiz : MonoBehaviour
     }
     public float durationAnswer = 7f;
     private bool startTimer = false;
-    private Vector3 oriScaleQuestionBoard;
-    private float elapsedTimeTransition;
 
     public void StartTimer()
     {

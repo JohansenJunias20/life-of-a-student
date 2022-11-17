@@ -51,6 +51,7 @@ MonoBehaviour:
   length: 30
   type: 1
   damage: 7
+  child: {fileID: 8684943209966236252}
 --- !u!50 &-5957553155143824518
 Rigidbody2D:
   serializedVersion: 4

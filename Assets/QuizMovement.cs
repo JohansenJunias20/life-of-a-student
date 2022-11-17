@@ -9,7 +9,7 @@ public class QuizMovement : MonoBehaviour
     float timeElapsed = 0;
     private float duration;
     private int length = 30;
-    private Vector3 startPosition = new Vector3(6.22f, -0.24f, 0);
+    private Vector3 startPosition;
     private Vector3 endPosition;
     public GameObject CanvasQuiz;
     // Start is called before the first frame update
@@ -21,6 +21,20 @@ public class QuizMovement : MonoBehaviour
         //GameInstance.onQuizAnswer += QuizAnswer;
         GameInstance.onGameOver += onGameOver;
         GameInstance.onResetGame += onReset;
+        GameInstance.onResume += () =>
+        {
+            underPause = false;
+        };
+        GameInstance.backToMainMenu += () =>
+        {
+            onReset();
+            stopMoving = true;
+            underPause = false;
+        };
+        GameInstance.onPause += () =>
+        {
+            underPause = true;
+        };
 
         this.startPosition = transform.position;
         this.endPosition = new Vector3();
@@ -32,6 +46,7 @@ public class QuizMovement : MonoBehaviour
 
     private void onReset()
     {
+        underPause = false;
         this.InitPositions();
         //stopMoving = true;
     }
@@ -39,11 +54,12 @@ public class QuizMovement : MonoBehaviour
     private void onGameOver()
     {
         stopMoving = true;
+        underPause = false;
     }
 
     void InitPositions()
     {
-        this.startPosition = new Vector3(6.22f, -0.24f, 0);
+        //this.startPosition = new Vector3(6.22f, -0.24f, 0);
         this.endPosition = new Vector3();
         this.transform.position = startPosition;
         endPosition.x = this.startPosition.x - Mathf.Cos(Mathf.Deg2Rad * degreeDirection) * length;
@@ -81,8 +97,10 @@ public class QuizMovement : MonoBehaviour
 
         //CanvasQuiz.SetActive(true);
     }
+    bool underPause = false;
     public void StartMove()
     {
+        if (underPause) return;
         //this.Start();
         InitPositions();
         GetComponent<EdgeCollider2D>().enabled = true;
@@ -93,6 +111,7 @@ public class QuizMovement : MonoBehaviour
     void Update()
     {
         if (stopMoving) return;
+        if (underPause) return;
         if (timeElapsed < duration)
         {
             var valueToLerp = Vector3.Lerp(this.startPosition, this.endPosition, timeElapsed / duration);

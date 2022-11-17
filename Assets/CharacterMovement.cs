@@ -7,16 +7,29 @@ using static ObstacleSpawner;
 public class CharacterMovement : MonoBehaviour
 {
     // Start is called before the first frame update
-    public GameObject posLeft, posCenter, posRight;
+    public GameObject posLeft, posCenter, posRight, toga;
     private string currentPosition = "center";
     public Animator animator;
     void Start()
     {
         GameInstance.onResetGame += onReset;
-        GameInstance.onFinishHit += delegate ()
+        GameInstance.onPause += () =>
         {
             stopMovement = true;
             animator.SetBool("Running", false);
+        };
+        GameInstance.onResume += () =>
+        {
+            stopMovement = false;
+            animator.SetBool("Running", true);
+        };
+        GameInstance.onFinishHit += delegate ()
+        {
+            stopMovement = true;
+            toga.SetActive(true);
+            toga.GetComponent<Animator>().Play("TogaAnimasi");
+            animator.SetBool("Running", false);
+            StartCoroutine(delayFinishFeedback());
         };
         GameInstance.onResetGame += delegate ()
         {
@@ -45,8 +58,14 @@ public class CharacterMovement : MonoBehaviour
         };
         this.gameObject.transform.position = posCenter.transform.position;
     }
+    IEnumerator delayFinishFeedback()
+    {
+        yield return new WaitForSeconds(2);
+        GameInstance.onFinishCanvasShow?.Invoke();
+    }
     private void onReset()
     {
+        toga.SetActive(false);
         this.gameObject.transform.position = posCenter.transform.position;
         currentPosition = "center";
     }

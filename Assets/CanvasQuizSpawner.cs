@@ -27,6 +27,7 @@ public class CanvasQuizSpawner : MonoBehaviour
     {
         Debug.Log("POPPING CANVAS QUIZ...");
         GO_CanvasQuiz.SetActive(true);
+        GO_CanvasQuiz.GetComponent<Animator>().Play("CanvasQuiz");
         GO_CanvasQuiz.GetComponent<CanvasQuiz>().nextQuiz();
         GO_CanvasQuiz.GetComponent<CanvasQuiz>().StartTimer();
     }

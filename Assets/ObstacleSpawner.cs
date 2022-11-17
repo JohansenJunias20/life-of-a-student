@@ -32,6 +32,23 @@ public class ObstacleSpawner : MonoBehaviour
         GameInstance.onFinishHit += onGameFinish;
         GameInstance.onResetGame += onReset;
         GameInstance.onStart += onReset;
+        GameInstance.backToMainMenu += () =>
+        {
+            destroyObstacles();
+        };
+
+        GameInstance.backToMainMenu += () =>
+        {
+            stopSpawn = true;
+        };
+        GameInstance.onResume += () =>
+        {
+            stopSpawn = false;
+        };
+        GameInstance.onPause += () =>
+        {
+            stopSpawn = true;
+        };
         StartCoroutine(Spawner());
     }
 
@@ -39,6 +56,10 @@ public class ObstacleSpawner : MonoBehaviour
     {
         this.stopSpawn = false;
         this.interval = startInterval;
+        destroyObstacles();
+    }
+    private void destroyObstacles()
+    {
         this.obstacles.ForEach(obstacle =>
         {
             if (obstacle.gameObject != null)
@@ -46,7 +67,6 @@ public class ObstacleSpawner : MonoBehaviour
         });
         this.obstacles.Clear();
     }
-
     private void onGameFinish()
     {
         stopSpawn = true;
@@ -88,7 +108,22 @@ public class ObstacleSpawner : MonoBehaviour
             if (stopSpawn) continue;
             var obstacleType = (ObstacleType)Random.Range(0, 3);
             var position = (PositionSpawn)Random.Range(0, 3);
+
+            if (Random.Range(0, 2) == 0)
+            {
+                var newposition = position;
+                //while (newposition == position)
+                //{
+                //    newposition = (PositionSpawn)Random.Range(0, 3);
+
+                //}
+                newposition += 1;
+                newposition = (PositionSpawn)((int)newposition % 3);
+                var newobstacleType = (ObstacleType)Random.Range(0, 3);
+                SpawnObject(newobstacleType, newposition);
+            }
             SpawnObject(obstacleType, position);
+
         }
     }
     void SpawnObject(ObstacleType obstacle, PositionSpawn position)

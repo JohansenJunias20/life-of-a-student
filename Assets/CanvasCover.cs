@@ -18,6 +18,7 @@ public class CanvasCover : MonoBehaviour
     {
         //GameInstance.onHTPOpen?.Invoke();
         go_HTP.SetActive(true);
+        go_HTP.GetComponent<Animator>().Play("CanvasHTP");
         //this.gameObject.SetActive(false);
         //go_CanvasCover.SetActive(false);
     }

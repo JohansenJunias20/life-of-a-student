@@ -18,6 +18,14 @@ public class FloorSpawner : MonoBehaviour
     {
         movementSpeed = GameInstance.speed;
         GameInstance.onQuizStart += StopTheMovement;
+        GameInstance.onStart += () =>
+        {
+            StartTheMovement();
+        };
+        GameInstance.onResume += () =>
+        {
+            StartTheMovement();
+        };
         GameInstance.onFeedbackAnswerDone += delegate ()
         {
             StartTheMovement();
@@ -26,6 +34,10 @@ public class FloorSpawner : MonoBehaviour
         GameInstance.onResetGame += delegate ()
         {
             StartTheMovement();
+        };
+        GameInstance.onPause += () =>
+        {
+            StopTheMovement();
         };
         GameInstance.onGameOver += StopTheMovement;
         List<GameObject> temp = new List<GameObject>();

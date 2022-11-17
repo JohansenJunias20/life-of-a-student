@@ -27,7 +27,16 @@ public class CitySpawnerMovement : MonoBehaviour
         GameInstance.onGameOver += StopTheMovement;
         GameInstance.onFinishHit += StopTheMovement;
         GameInstance.onResetGame += StartTheMovement;
+        GameInstance.onResume += () =>
+        {
+            StartTheMovement();
+        };
         GameInstance.onStart += StartTheMovement;
+        GameInstance.onPause += () =>
+        {
+            stopMovement = true;
+            //paus
+        };
         GameInstance.onFeedbackAnswerDone += () => { StartTheMovement(); };
         GameObject go_atas_0 = new GameObject();
         var spriteRenderer = go_atas_0.AddComponent<SpriteRenderer>();

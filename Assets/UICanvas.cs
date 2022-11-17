@@ -13,10 +13,11 @@ public class UICanvas : MonoBehaviour
     public GameObject ShadowFill;
     public GameObject fillHealthBar;
     public float health = 100f;
-    public GameObject GO_healthText ;
+    public GameObject GO_healthText;
     public GameObject GO_healthTextShadow;
     public Sprite shadowHealthRed, shadowHealthGreen, healthRed;
     public GameObject Quiz;
+    public GameObject canvasPause;
     private int score = 0;
     private Sprite OriFillHealth;
     // Start is called before the first frame update
@@ -31,6 +32,19 @@ public class UICanvas : MonoBehaviour
         GameInstance.onFinishHit += onGameFinish;
         GameInstance.onResetGame += onReset;
         GameInstance.onStart += onStart;
+        GameInstance.onResume += () =>
+        {
+            disablePause = false;
+            pauseScore = false;
+            stopQuiz = false;
+        };
+        GameInstance.backToMainMenu += () =>
+        {
+            onReset();
+            stopQuiz = true;
+            pauseScore = true;
+            //stop
+        };
 
         //var text = this.gameObject.transform.Find("TextScore");
         //var text = this.gameObject.transform.Find("TextScore").GetComponent<TMPro.TextMeshPro>();
@@ -42,6 +56,7 @@ public class UICanvas : MonoBehaviour
     private void FeedbackAnswerDone()
     {
         pauseScore = false;
+        disablePause = false;
     }
 
     private void onStart()
@@ -52,6 +67,7 @@ public class UICanvas : MonoBehaviour
     private void onReset()
     {
         GameInstance.score = 0;
+        disablePause = false;
         pauseScore = false;
         stopQuiz = false;
         health = 100f;
@@ -72,6 +88,7 @@ public class UICanvas : MonoBehaviour
 
     private void onGameFinish()
     {
+        disablePause = true;
         pauseScore = true;
         stopQuiz = true;
         //throw new NotImplementedException();
@@ -86,6 +103,16 @@ public class UICanvas : MonoBehaviour
     float finalShadowHealth = 100f;
     float startShadowHelath = 100f;
     float finalHealth = 100f;
+    public void onPause()
+    {
+        if (disablePause) return;
+        GameInstance.onPause?.Invoke();
+        canvasPause.SetActive(true);
+        canvasPause.GetComponent<Animator>().Play("CanvasPause");
+        stopQuiz = true;
+        pauseScore = true;
+        disablePause = true;
+    }
     private void onReduceHealth(float obj)
     {
         Debug.Log("reducing health...");
@@ -101,6 +128,7 @@ public class UICanvas : MonoBehaviour
         {
             GameInstance.onGameOver?.Invoke();
             this.gameObject.transform.Find("GameOver").gameObject.SetActive(true);
+            this.gameObject.transform.Find("GameOver").gameObject.GetComponent<Animator>().Play("GameOver");
             pauseScore = true;
         }
         Debug.Log(finalHealth);
@@ -130,7 +158,7 @@ public class UICanvas : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             if (color == ColorType.green)
             {
-                fillHealthBar.GetComponent<Image>().color = new Color(200/255f, 255/255f, 198/255f, 1f);
+                fillHealthBar.GetComponent<Image>().color = new Color(200 / 255f, 255 / 255f, 198 / 255f, 1f);
 
             }
             else
@@ -148,6 +176,7 @@ public class UICanvas : MonoBehaviour
     //IEnumerator
     private void QuizAnswer(CanvasQuiz.AnswerType obj)
     {
+        disablePause = false;
         if (obj == CanvasQuiz.AnswerType.Correct)
         {
             //health += 10f;
@@ -169,11 +198,12 @@ public class UICanvas : MonoBehaviour
             return;
         }
     }
-
+    private bool disablePause = false;
     private bool pauseScore = true;
     private void onQuizStart()
     {
         pauseScore = true;
+        disablePause = true;
     }
     private void UICanvas_on75m()
     {

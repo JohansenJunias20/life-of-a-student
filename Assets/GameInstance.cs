@@ -6,6 +6,7 @@ using static CanvasQuiz;
 
 public class GameInstance : MonoBehaviour
 {
+    public static Action onPause;
     public static Action onStart { get; set; }
     public static Action onHTPOpen { get; set; }
     public static Action onResetGame { get; set; }
@@ -16,11 +17,15 @@ public class GameInstance : MonoBehaviour
     public static float speed = 8f;
     //value between 0-1 tujuannya untuk merubah speed sewaktu2
     public static float speedScale = 1f;
+    public static Action onResume;
+    public static Action backToMainMenu;
+
     //perintah untuk ngespawn Finish, dipanggil di QuizMovement, dilisten di FinishSpawner
     public static Action SpawnFinish { get; set; }
     //saat finish Game Object hit ke character, dipanggil di FinishMovement, dilisten 
     //hampir semua karena semua activity harus di stop saat finish line sudah ke hit character
     public static Action onFinishHit { get; set; }
+    public static Action onFinishCanvasShow { get; set; }
     public static Action onLastQuizAnswered { get; set; }
     public static Action onGameOver { get; set; }
     public static Action<float> ReduceHealth { get; set; }

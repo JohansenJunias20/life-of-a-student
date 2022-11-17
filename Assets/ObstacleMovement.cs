@@ -8,12 +8,13 @@ public class ObstacleMovement : MonoBehaviour
 {
     private int degreeDirection = 30;
     float timeElapsed = 0;
-    private float duration ;
+    private float duration;
     public int length = 30;
     private Vector3 startPosition;
     private Vector3 endPosition;
     public ObstacleType type;
     public float damage;
+    public GameObject child;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +24,30 @@ public class ObstacleMovement : MonoBehaviour
         endPosition.x = this.startPosition.x - Mathf.Cos(Mathf.Deg2Rad * degreeDirection) * length;
         endPosition.y = this.startPosition.y - Mathf.Sin(Mathf.Deg2Rad * degreeDirection) * length;
         endPosition.z = 0;
+        GameInstance.backToMainMenu += () =>
+        {
+            stopMovement = true;
+            try
+            {
+                if (this.gameObject != null)
+                    Destroy(this.gameObject);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        };
+        GameInstance.onPause += () =>
+        {
+            stopMovement = true;
+            if (child)
+                child.GetComponent<Animator>().enabled = false;
+        };
+        GameInstance.onResume += () =>
+        {
+            stopMovement = false;
+            if (child) child.GetComponent<Animator>().enabled = true;
+        };
         GameInstance.onQuizDone += GameInstance_onQuizDone;
         GameInstance.onQuizStart += GameInstance_onQuizStart;
         GameInstance.onQuizSpawn += GameInstance_onQuizSpawn;
@@ -38,7 +63,14 @@ public class ObstacleMovement : MonoBehaviour
         //stopMovement = false;
         stopMovement = false;
         Debug.Log("GAME OBJECT OBSTACLE DESTROYED...");
-        Destroy(gameObject);
+        try
+        {
+            Destroy(gameObject);
+        }
+        catch (Exception ex)
+        {
+
+        }
         //this.gameObject.SetActive(false);
     }
 
