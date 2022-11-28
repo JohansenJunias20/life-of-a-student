@@ -34,28 +34,54 @@ public class ObstacleSpawner : MonoBehaviour
         GameInstance.onStart += onReset;
         GameInstance.backToMainMenu += () =>
         {
+            if (cour != null)
+                StopCoroutine(cour);
             destroyObstacles();
-        };
-
-        GameInstance.backToMainMenu += () =>
-        {
             stopSpawn = true;
         };
         GameInstance.onResume += () =>
         {
             stopSpawn = false;
+            underPause = false;
         };
         GameInstance.onPause += () =>
         {
             stopSpawn = true;
+            underPause = true;
+        };
+        GameInstance.onLastQuizAnswered += () =>
+        {
+            cour = StartCoroutine(delayStop());
         };
         StartCoroutine(Spawner());
+    }
+    Coroutine cour = null;
+    IEnumerator delayStop()
+    {
+        var duration = 14;
+        var i = 0;
+        while ( i < duration)
+        {
+            if (underPause) yield return 0;
+            else
+            {
+                yield return new WaitForSeconds(1);
+                i++;
+            }
+        }
+        while (underPause)
+        {
+            yield return null;
+        }
+        stopSpawn = true;
     }
 
     private void onReset()
     {
         this.stopSpawn = false;
         this.interval = startInterval;
+        if (cour != null)
+            StopCoroutine(cour);
         destroyObstacles();
     }
     private void destroyObstacles()
@@ -96,6 +122,8 @@ public class ObstacleSpawner : MonoBehaviour
     }
 
     private bool stopSpawn = true;
+    private bool underPause;
+
     private void GameInstance_onQuizStart()
     {
         stopSpawn = true;

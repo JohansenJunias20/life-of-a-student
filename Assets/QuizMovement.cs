@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class QuizMovement : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class QuizMovement : MonoBehaviour
     private Vector3 startPosition;
     private Vector3 endPosition;
     public GameObject CanvasQuiz;
+    public UnityEvent onHit;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +32,10 @@ public class QuizMovement : MonoBehaviour
             onReset();
             stopMoving = true;
             underPause = false;
+            if (cour != null)
+            {
+                StopCoroutine(cour);
+            }
         };
         GameInstance.onPause += () =>
         {
@@ -47,6 +53,8 @@ public class QuizMovement : MonoBehaviour
     private void onReset()
     {
         underPause = false;
+        isGameOver = false;
+        stopMoving = true;
         this.InitPositions();
         //stopMoving = true;
     }
@@ -54,7 +62,9 @@ public class QuizMovement : MonoBehaviour
     private void onGameOver()
     {
         stopMoving = true;
+        isGameOver = true;
         underPause = false;
+        onReset();
     }
 
     void InitPositions()
@@ -68,6 +78,7 @@ public class QuizMovement : MonoBehaviour
         this.timeElapsed = 0;
         //this.gameObject.GetComponent<SpriteRenderer>()
     }
+    private bool isGameOver = false;
     private void FeedBackDone()
     {
         GetComponent<EdgeCollider2D>().enabled = false;
@@ -78,11 +89,16 @@ public class QuizMovement : MonoBehaviour
     {
         Debug.Log("Quiz spawning...");
         //StartMove();
-        StartCoroutine(delaySpawn());
+        cour = StartCoroutine(delaySpawn());
     }
+    Coroutine cour = null;
     IEnumerator delaySpawn()
     {
         yield return new WaitForSeconds(1f);
+        //while (underPause)
+        //{
+        //    yield return 0;
+        //}
         StartMove();
     }
     public void OnTriggerEnter2D(Collider2D collision)
@@ -91,6 +107,7 @@ public class QuizMovement : MonoBehaviour
         {
             GameInstance.onQuizStart.Invoke();
             this.stopMoving = true;
+            onHit?.Invoke();
             return;
         }
 
@@ -100,7 +117,7 @@ public class QuizMovement : MonoBehaviour
     bool underPause = false;
     public void StartMove()
     {
-        if (underPause) return;
+        if (isGameOver) return;
         //this.Start();
         InitPositions();
         GetComponent<EdgeCollider2D>().enabled = true;

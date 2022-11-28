@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FinishSpawner : MonoBehaviour
 {
@@ -11,6 +12,13 @@ public class FinishSpawner : MonoBehaviour
     {
         GameInstance.onLastQuizAnswered += onLastQuizAnswered;
         GameInstance.onFinishCanvasShow += showFinishCanvas;
+        GameInstance.backToMainMenu += delegate ()
+        {
+            if (cour != null)
+            {
+                StopCoroutine(cour);
+            }
+        };
         GameInstance.onGameOver += onGameOver;
         GameInstance.onResetGame += onReset;
         GameInstance.onPause += () =>
@@ -23,13 +31,18 @@ public class FinishSpawner : MonoBehaviour
         };
         GameInstance.onStart += () =>
         {
-            underPause = true;
+            underPause = false;
         };
     }
     private bool gameOver = false;
     private void onGameOver()
     {
         gameOver = true;
+        if (cour != null)
+        {
+            StopCoroutine(cour);
+            Debug.Log("couroutine Stopped!");
+        }
         //throw new NotImplementedException();
     }
 
@@ -41,16 +54,27 @@ public class FinishSpawner : MonoBehaviour
         if (cour != null)
         {
             StopCoroutine(cour);
+            Debug.Log("couroutine Stopped!");
         }
 
     }
 
     private void showFinishCanvas()
     {
+        onShowCanvas?.Invoke();
         FinishCanvas.SetActive(true);
+        if (FinishCanvas.GetComponent<FinishCanvas>().isWin())
+        {
+            onWin?.Invoke();
+        }
+        else
+        {
+            onLose?.Invoke();
+        }
         //throw new NotImplementedException();
     }
 
+    public UnityEvent onShowCanvas, onLose, onWin;
     public float distance = 75;
     private void onLastQuizAnswered()
     {
@@ -62,11 +86,29 @@ public class FinishSpawner : MonoBehaviour
     IEnumerator spawnFinish()
     {
         Debug.Log("SPAWNING FINISH... IN 15SECS");
-        yield return new WaitForSeconds(15);
+        //WAITFORSECONDS walaupun dipause tetap jalan. tidak bisa pakai while loop yg di line 95
+        int duration = 15;
+        int i = 0;
+        while (i < duration)
+        {
+            Debug.Log(underPause);
+            if (underPause) { yield return 0; }
+            else
+            {
+                yield return new WaitForSeconds(1);
+                Debug.Log("tick SPAWN FINISH");
+                i++;
+            }
+        }
         Debug.Log("SPAWNING FINISH");
 
-        if (!gameOver)
-            GameInstance.SpawnFinish?.Invoke();
+        if (gameOver) yield return 0;
+
+        while (underPause)
+        {
+            yield return null;
+        }
+        GameInstance.SpawnFinish?.Invoke();
     }
 
     // Update is called once per frame

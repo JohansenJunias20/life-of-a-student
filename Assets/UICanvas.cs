@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class UICanvas : MonoBehaviour
@@ -36,7 +37,7 @@ public class UICanvas : MonoBehaviour
         {
             disablePause = false;
             pauseScore = false;
-            stopQuiz = false;
+            //stopQuiz = false;
         };
         GameInstance.backToMainMenu += () =>
         {
@@ -90,7 +91,7 @@ public class UICanvas : MonoBehaviour
     {
         disablePause = true;
         pauseScore = true;
-        stopQuiz = true;
+        stopQuiz = false;
         //throw new NotImplementedException();
     }
 
@@ -106,6 +107,7 @@ public class UICanvas : MonoBehaviour
     public void onPause()
     {
         if (disablePause) return;
+        onShowPauseCanvas?.Invoke();
         GameInstance.onPause?.Invoke();
         canvasPause.SetActive(true);
         canvasPause.GetComponent<Animator>().Play("CanvasPause");
@@ -113,9 +115,10 @@ public class UICanvas : MonoBehaviour
         pauseScore = true;
         disablePause = true;
     }
+    public UnityEvent onShowPauseCanvas;
     private void onReduceHealth(float obj)
     {
-        Debug.Log("reducing health...");
+        //Debug.Log("reducing health...");
         ShadowFill.GetComponent<Image>().sprite = shadowHealthRed;
         elapsedTime = 0;
         startShadowHelath = shadowHealth;
@@ -129,21 +132,24 @@ public class UICanvas : MonoBehaviour
             GameInstance.onGameOver?.Invoke();
             this.gameObject.transform.Find("GameOver").gameObject.SetActive(true);
             this.gameObject.transform.Find("GameOver").gameObject.GetComponent<Animator>().Play("GameOver");
+            onGameOver?.Invoke();
             pauseScore = true;
         }
-        Debug.Log(finalHealth);
+        //Debug.Log(finalHealth);
         StartCoroutine(blinkingHP(ColorType.red));
         StartCoroutine(reduceShadowHealth());
         GameInstance.score = Convert.ToInt32(finalHealth);
 
     }
+    public UnityEvent onGameOver;
     IEnumerator reduceShadowHealth()
     {
         yield return new WaitForSeconds(0.6f);
         elapsedTimeShadow = 0;
         //Debug.Log("shadow reducing...");
         finalShadowHealth = finalHealth;
-        Debug.Log(finalHealth);
+        startShadowHelath = shadowHealth;
+        //Debug.Log(finalHealth);
     }
     public enum ColorType
     {
@@ -193,6 +199,11 @@ public class UICanvas : MonoBehaviour
             return;
         }
         if (obj == CanvasQuiz.AnswerType.Wrong)
+        {
+            this.onReduceHealth(25f);
+            return;
+        }
+        if (obj == CanvasQuiz.AnswerType.Timeout)
         {
             this.onReduceHealth(25f);
             return;

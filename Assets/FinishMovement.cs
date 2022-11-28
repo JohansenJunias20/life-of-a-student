@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FinishMovement : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class FinishMovement : MonoBehaviour
         this.InitPositions();
         toga.SetActive(true);
         this.stopMoving = true;
+        underPause = false;
     }
 
     private void spawn()
@@ -67,13 +69,14 @@ public class FinishMovement : MonoBehaviour
         this.timeElapsed = 0;
     }
 
+    public UnityEvent onFinishHit;
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.name.ToLower() == "player")
         {
+            onFinishHit?.Invoke();
             GameInstance.onFinishHit?.Invoke();
-            Debug.Log("character hit the finish line!!");
             Debug.Log("character hit the finish line!!");
             this.stopMoving = true;
             return;

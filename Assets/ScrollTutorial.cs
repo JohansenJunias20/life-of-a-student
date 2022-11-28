@@ -17,7 +17,10 @@ public class ScrollTutorial : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        GameInstance.onHTPOpen += () => {
+            posisi = 0;
+            scroll_pos = 0;
+        };
     }
     public void next()
     {

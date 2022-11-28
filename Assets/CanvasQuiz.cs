@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class CanvasQuiz : MonoBehaviour
@@ -17,7 +18,7 @@ public class CanvasQuiz : MonoBehaviour
     private void onReset()
     {
         GameInstance.indexQuiz = -1;
-        currentDuration = -1;
+        currentDuration = 7;
         timeout = false;
         this.gameObject.SetActive(false);
     }
@@ -28,6 +29,7 @@ public class CanvasQuiz : MonoBehaviour
         public int answer { get; set; }
 
     };
+    public UnityEvent onCorrectAnswer, onWrongAnswer, onTimeout;
     public List<IQuiz> quiz = new List<IQuiz>()
     {
               new IQuiz()
@@ -54,7 +56,8 @@ public class CanvasQuiz : MonoBehaviour
         //    pertanyaan = "Seorang yang berpikir 'Outside the box' adalah ?  ",
         //    jawaban = new string[3] { "Entrepreneur", "Sociopreneur", "Technopreneur" },
         //    answer = 3
-        //},
+        //}
+        //,
         //new IQuiz()
         //{
         //    pertanyaan = "Sebuah badan usaha yang memberikan pendanaan pada sebuah start-up adalah ?",
@@ -84,7 +87,8 @@ public class CanvasQuiz : MonoBehaviour
         //    pertanyaan = "Yang tidak termasuk dalam segementasi pasar adalah ?  ",
         //    jawaban = new string[3] { "Segemented Market", "Mass Market", "Target Market" },
         //    answer = 3
-        //},
+        //}
+        //,
         //new IQuiz()
         //{
         //    pertanyaan = "Ciri-ciri dari Segmented Marketing, kecuali ?",
@@ -113,55 +117,58 @@ public class CanvasQuiz : MonoBehaviour
         if (index + 1 == quiz[GameInstance.indexQuiz].answer)
         {
             //benar
+            onCorrectAnswer?.Invoke();
             Debug.Log("BENAR!");
             GameInstance.onQuizAnswer?.Invoke(AnswerType.Correct);
-            switch (index)
-            {
-                case 0:
-                    GO_Box1.gameObject.SetActive(true);
-                    GO_Box1.GetComponent<Image>().sprite = BoxGreen;
-                    break;
-                case 1:
-                    GO_Box2.gameObject.SetActive(true);
-                    GO_Box3.GetComponent<Image>().sprite = BoxGreen;
-                    break;
-                case 2:
-                    GO_Box3.gameObject.SetActive(true);
-                    GO_Box3.GetComponent<Image>().sprite = BoxGreen;
-                    break;
-                default:
-                    break;
-            }
+            //switch (index)
+            //{
+            //    case 0:
+            //        GO_Box1.gameObject.SetActive(true);
+            //        GO_Box1.GetComponent<Image>().sprite = BoxGreen;
+            //        break;
+            //    case 1:
+            //        GO_Box2.gameObject.SetActive(true);
+            //        GO_Box3.GetComponent<Image>().sprite = BoxGreen;
+            //        break;
+            //    case 2:
+            //        GO_Box3.gameObject.SetActive(true);
+            //        GO_Box3.GetComponent<Image>().sprite = BoxGreen;
+            //        break;
+            //    default:
+            //        break;
+            //}
             StartCoroutine(blinking(AnswerType.Correct, index));
 
         }
         else
         {
             Debug.Log("SALAH!");
-            switch (index)
-            {
-                case 0:
-                    GO_Box1.gameObject.SetActive(true);
-                    GO_Box1.GetComponent<Image>().sprite = BoxRed;
-                    break;
-                case 1:
-                    GO_Box2.gameObject.SetActive(true);
-                    GO_Box2.GetComponent<Image>().sprite = BoxRed;
-                    break;
-                case 2:
-                    GO_Box3.gameObject.SetActive(true);
-                    GO_Box3.GetComponent<Image>().sprite = BoxRed;
-                    break;
-                default:
-                    break;
-            }
+            onWrongAnswer?.Invoke();
+
+            //switch (index)
+            //{
+            //    case 0:
+            //        GO_Box1.gameObject.SetActive(true);
+            //        GO_Box1.GetComponent<Image>().sprite = BoxRed;
+            //        break;
+            //    case 1:
+            //        GO_Box2.gameObject.SetActive(true);
+            //        GO_Box2.GetComponent<Image>().sprite = BoxRed;
+            //        break;
+            //    case 2:
+            //        GO_Box3.gameObject.SetActive(true);
+            //        GO_Box3.GetComponent<Image>().sprite = BoxRed;
+            //        break;
+            //    default:
+            //        break;
+            //}
             StartCoroutine(blinking(AnswerType.Wrong, index));
             //salah
             GameInstance.onQuizAnswer?.Invoke(AnswerType.Wrong);
         }
         StartCoroutine(delayFeedback());
         GameInstance.speedScale += 0.3f;
-        GameInstance.speedScale = Math.Min(GameInstance.speedScale, 2.5f);
+        GameInstance.speedScale = Math.Min(GameInstance.speedScale, 1.8f);
     }
     public GameObject GO_Box1, GO_Box2, GO_Box3;
     IEnumerator delayFeedback()
@@ -177,7 +184,6 @@ public class CanvasQuiz : MonoBehaviour
         var times = 0;
         while (true)
         {
-            yield return new WaitForSeconds(0.2f);
             switch (index)
             {
                 case 0:
@@ -196,6 +202,8 @@ public class CanvasQuiz : MonoBehaviour
             GO_Answer1.GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
             GO_Answer2.GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
             GO_answer3.GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
+            yield return new WaitForSeconds(0.2f);
+
             if (times == 5)
             {
                 break;
@@ -226,6 +234,7 @@ public class CanvasQuiz : MonoBehaviour
         currentDuration -= Time.deltaTime;
         if (currentDuration <= 0 && !timeout)
         {
+            onTimeout?.Invoke();
             if (GameInstance.indexQuiz + 1 == quiz.Count)
             {
                 GameInstance.onLastQuizAnswered?.Invoke();
@@ -237,23 +246,30 @@ public class CanvasQuiz : MonoBehaviour
             StartCoroutine(delayFeedback());
             GameInstance.onQuizAnswer?.Invoke(AnswerType.Timeout);
             //this.gameObject.SetActive(false);
-            shakeTimer = false;
         }
         if (currentDuration <= 3)
         {
             //INI DIPANGGIL SAAT ANGKANYA BERUBAH SAJA
             //StartCoroutine(Shake(0.5f, 0.5f));
-            shakeTimer = true;
+            if (TMP_Timer.text != Convert.ToInt32(Math.Clamp(currentDuration, 0, 100)).ToString())
+            {
+
+                TMP_Timer.color = Color.red;
+                StartCoroutine(Shake(0.5f, 5f));
+                onShakeTimer?.Invoke();
+            }
         }
         else
         {
-            shakeTimer = false;
+
         }
+
         TMP_Timer.text = Convert.ToInt32(Math.Clamp(currentDuration, 0, 100)).ToString();
     }
-
+    public UnityEvent onShakeTimer;
     public void nextQuiz()
     {
+        currentDuration = durationAnswer;
         answered = false;
         timeout = false;
         GameInstance.indexQuiz++;
@@ -271,35 +287,35 @@ public class CanvasQuiz : MonoBehaviour
         TMP_Answer2.text = currentQuiz.jawaban[1];
         TMP_Answer3.text = currentQuiz.jawaban[2];
         TMP_Pertanyaan.text = currentQuiz.pertanyaan;
+        TMP_Timer.color = Color.white;
     }
     public IEnumerator Shake(float duration, float magnitude)
     {
-        Vector3 orignalPosition = transform.position;
+        Vector3 orignalPosition = TMP_Timer.transform.position;
         float elapsed = 0f;
 
         while (elapsed < duration)
         {
             float x = UnityEngine.Random.Range(-1f, 1f) * magnitude;
             float y = UnityEngine.Random.Range(-1f, 1f) * magnitude;
-            TMP_Timer.transform.position = new Vector3(x, y, 0f);
+            TMP_Timer.transform.position = orignalPosition + new Vector3(x, y, 0f);
 
             elapsed += Time.deltaTime;
             yield return 0;
         }
-        transform.position = orignalPosition;
+        TMP_Timer.transform.position = orignalPosition;
     }
-  
-    private bool shakeTimer = false;
+
     private float _currentDuration;
     private float currentDuration
     {
         get { return _currentDuration; }
         set
         {
-            if (shakeTimer && _currentDuration != -1f)
-            {
-                //StartCoroutine(Shake(0.5f, 0.2f));
-            };
+            //if (shakeTimer && _currentDuration != -1f)
+            //{
+            //    //StartCoroutine(Shake(0.5f, 0.2f));
+            //};
             _currentDuration = value;
         }
     }

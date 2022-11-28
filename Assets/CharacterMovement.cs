@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using static CanvasQuiz;
 using static ObstacleSpawner;
 
@@ -8,8 +9,10 @@ public class CharacterMovement : MonoBehaviour
 {
     // Start is called before the first frame update
     public GameObject posLeft, posCenter, posRight, toga;
+    private Vector3 initAnimPos = new Vector3(-10.53f, -6.77f, 2.00f);
     private string currentPosition = "center";
     public Animator animator;
+    public UnityEvent onHitObstacle;
     void Start()
     {
         GameInstance.onResetGame += onReset;
@@ -53,10 +56,28 @@ public class CharacterMovement : MonoBehaviour
         };
         GameInstance.onStart += delegate ()
         {
+            currentPosition = "center";
+            this.transform.position = initAnimPos;
+            StartCoroutine(startAnim());
             animator.SetBool("Running", true);
-            stopMovement = false;
         };
         this.gameObject.transform.position = posCenter.transform.position;
+    }
+    bool underPause = false;
+    IEnumerator startAnim()
+    {
+        stopMovement = true;
+        var duration = 1.8f;
+        var elapsedTimeAnim = 0f;
+        while (elapsedTimeAnim < duration)
+        {
+            
+            elapsedTimeAnim += Time.deltaTime;
+            var alpha = Mathf.SmoothStep(0f, 1f, elapsedTimeAnim / duration);
+            gameObject.transform.position = Vector3.Lerp(initAnimPos, posCenter.transform.position, alpha);
+            yield return 0;
+        }
+        stopMovement = false;
     }
     IEnumerator delayFinishFeedback()
     {
@@ -66,16 +87,17 @@ public class CharacterMovement : MonoBehaviour
     private void onReset()
     {
         toga.SetActive(false);
+        
         this.gameObject.transform.position = posCenter.transform.position;
         currentPosition = "center";
     }
     public void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("character hit something");
         var result = other.gameObject.GetComponent<ObstacleMovement>();
         if (result == null) return;
         Destroy(other.gameObject);
         GameInstance.ReduceHealth?.Invoke(result.damage);
+        onHitObstacle?.Invoke();
         StartCoroutine(Blinking());
     }
     bool blinking = false;
@@ -92,7 +114,7 @@ public class CharacterMovement : MonoBehaviour
             yield return new WaitForSeconds(0.25f);
             this.GetComponent<SpriteRenderer>().color = Color.white;
             yield return new WaitForSeconds(0.25f);
-            Debug.Log("blingking!");
+            //Debug.Log("blingking!");
             i++;
         }
         //blinking = false;
@@ -146,7 +168,6 @@ public class CharacterMovement : MonoBehaviour
         var duration = 0.25f;
         if (currentTransition)
         {
-            Debug.Log("under transition!");
             var startPos = transform.position;
             elapsedTime = 0;
             while (elapsedTime < duration)
@@ -165,7 +186,6 @@ public class CharacterMovement : MonoBehaviour
 
         elapsedTime = 0;
         currentTransition = true;
-        Debug.Log("not under transition!");
 
         while (elapsedTime < duration)
         {
@@ -180,6 +200,7 @@ public class CharacterMovement : MonoBehaviour
         currentTransition = false;
 
     }
+    public UnityEvent onMove;
     void MoveCharacter(string direction)
     {
 
@@ -212,6 +233,7 @@ public class CharacterMovement : MonoBehaviour
             if (prev != null)
                 StopCoroutine(prev);
         }
+        onMove?.Invoke();
         prev = StartCoroutine(Move());
         return;
         this.currentPosition = nextPos;

@@ -32,6 +32,10 @@ public class CanvasPause : MonoBehaviour
     {
         //GameInstance.onResetGame?.Invoke();
         GameInstance.backToMainMenu?.Invoke();
+        GameInstance.indexQuiz = -1;
+        GameInstance.speedScale = 1;
+        GameInstance.speed = 8f;
+
         this.gameObject.SetActive(false);
     }
 }
