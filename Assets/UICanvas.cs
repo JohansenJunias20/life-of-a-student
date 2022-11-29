@@ -37,6 +37,7 @@ public class UICanvas : MonoBehaviour
         {
             disablePause = false;
             pauseScore = false;
+            underPause = false;
             //stopQuiz = false;
         };
         GameInstance.backToMainMenu += () =>
@@ -81,6 +82,7 @@ public class UICanvas : MonoBehaviour
         elapsedTimeShadow = 0;
         stopQuiz = false;
         pauseScore = false;
+        underPause = false;
         score = 0;
         Debug.Log("reset!");
 
@@ -96,6 +98,8 @@ public class UICanvas : MonoBehaviour
     }
 
     bool stopQuiz = false;
+    private bool underPause = false;
+
     private void stopQuizSpawn()
     {
         stopQuiz = true;
@@ -112,9 +116,11 @@ public class UICanvas : MonoBehaviour
         canvasPause.SetActive(true);
         canvasPause.GetComponent<Animator>().Play("CanvasPause");
         stopQuiz = true;
+        underPause = true;
         pauseScore = true;
         disablePause = true;
     }
+
     public UnityEvent onShowPauseCanvas;
     private void onReduceHealth(float obj)
     {
@@ -216,12 +222,22 @@ public class UICanvas : MonoBehaviour
         pauseScore = true;
         disablePause = true;
     }
-    private void UICanvas_on75m()
+    IEnumerator spawnQuiz()
     {
         //respawn an Quiz
-        if (stopQuiz) return;
+        while (underPause)
+        {
+            yield return 0;
+        }
         GameInstance.onQuizSpawn?.Invoke();
         Debug.Log("start moving the quiz...");
+    }
+    private void UICanvas_on75m()
+    {
+        //if()
+        if (!stopQuiz)
+            StartCoroutine(spawnQuiz());
+
     }
     private int QuizCount = 0;
     private float elapsedTimeShadow = 0f;

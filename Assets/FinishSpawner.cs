@@ -18,6 +18,7 @@ public class FinishSpawner : MonoBehaviour
             {
                 StopCoroutine(cour);
             }
+            onReset();
         };
         GameInstance.onGameOver += onGameOver;
         GameInstance.onResetGame += onReset;
@@ -91,12 +92,12 @@ public class FinishSpawner : MonoBehaviour
         int i = 0;
         while (i < duration)
         {
-            Debug.Log(underPause);
+            //Debug.Log(underPause);
             if (underPause) { yield return 0; }
             else
             {
                 yield return new WaitForSeconds(1);
-                Debug.Log("tick SPAWN FINISH");
+                //Debug.Log("tick SPAWN FINISH");
                 i++;
             }
         }

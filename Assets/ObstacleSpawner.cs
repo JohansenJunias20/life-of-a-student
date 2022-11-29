@@ -38,6 +38,7 @@ public class ObstacleSpawner : MonoBehaviour
                 StopCoroutine(cour);
             destroyObstacles();
             stopSpawn = true;
+            this.underPause = false;
         };
         GameInstance.onResume += () =>
         {
@@ -46,7 +47,7 @@ public class ObstacleSpawner : MonoBehaviour
         };
         GameInstance.onPause += () =>
         {
-            stopSpawn = true;
+            //stopSpawn = true;
             underPause = true;
         };
         GameInstance.onLastQuizAnswered += () =>
@@ -60,7 +61,7 @@ public class ObstacleSpawner : MonoBehaviour
     {
         var duration = 14;
         var i = 0;
-        while ( i < duration)
+        while (i < duration)
         {
             if (underPause) yield return 0;
             else
@@ -80,8 +81,10 @@ public class ObstacleSpawner : MonoBehaviour
     {
         this.stopSpawn = false;
         this.interval = startInterval;
+        this.underPause = false;
         if (cour != null)
             StopCoroutine(cour);
+        //StartCoroutine(Spawner());
         destroyObstacles();
     }
     private void destroyObstacles()
@@ -130,10 +133,23 @@ public class ObstacleSpawner : MonoBehaviour
     }
     IEnumerator Spawner()
     {
+
         while (true)
         {
-            yield return new WaitForSeconds(interval);
-            if (stopSpawn) continue;
+            //yield return new WaitForSeconds(interval);
+            var timeCount = 0f;
+            while (timeCount < interval)
+            {
+                if (!underPause)
+                    timeCount += Time.deltaTime;
+                yield return 0;
+            }
+            Debug.Log("test!");
+
+            if (stopSpawn)
+            {
+                continue;
+            };
             var obstacleType = (ObstacleType)Random.Range(0, 3);
             var position = (PositionSpawn)Random.Range(0, 3);
 
@@ -151,7 +167,6 @@ public class ObstacleSpawner : MonoBehaviour
                 SpawnObject(newobstacleType, newposition);
             }
             SpawnObject(obstacleType, position);
-
         }
     }
     void SpawnObject(ObstacleType obstacle, PositionSpawn position)
