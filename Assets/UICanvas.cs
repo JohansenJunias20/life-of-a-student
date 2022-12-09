@@ -68,7 +68,7 @@ public class UICanvas : MonoBehaviour
     }
     private void onReset()
     {
-        GameInstance.score = 0;
+        GameInstance.score = 100;
         disablePause = false;
         pauseScore = false;
         stopQuiz = false;
@@ -115,7 +115,6 @@ public class UICanvas : MonoBehaviour
         GameInstance.onPause?.Invoke();
         canvasPause.SetActive(true);
         canvasPause.GetComponent<Animator>().Play("CanvasPause");
-        stopQuiz = true;
         underPause = true;
         pauseScore = true;
         disablePause = true;

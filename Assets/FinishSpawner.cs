@@ -19,6 +19,7 @@ public class FinishSpawner : MonoBehaviour
                 StopCoroutine(cour);
             }
             onReset();
+            underPause = false;
         };
         GameInstance.onGameOver += onGameOver;
         GameInstance.onResetGame += onReset;
@@ -90,6 +91,8 @@ public class FinishSpawner : MonoBehaviour
         //WAITFORSECONDS walaupun dipause tetap jalan. tidak bisa pakai while loop yg di line 95
         int duration = 15;
         int i = 0;
+        Debug.Log("under pause:");
+        Debug.Log(underPause);
         while (i < duration)
         {
             //Debug.Log(underPause);

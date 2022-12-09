@@ -144,7 +144,7 @@ public class ObstacleSpawner : MonoBehaviour
                     timeCount += Time.deltaTime;
                 yield return 0;
             }
-            Debug.Log("test!");
+            //Debug.Log("test!");
 
             if (stopSpawn)
             {

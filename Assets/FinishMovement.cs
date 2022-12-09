@@ -22,6 +22,11 @@ public class FinishMovement : MonoBehaviour
         GameInstance.onGameOver += onGameOver;
         GameInstance.SpawnFinish += spawn;
         GameInstance.onResetGame += onReset;
+        GameInstance.backToMainMenu += () =>
+        {
+            underPause = false;
+            onReset();
+        };
         GameInstance.onPause += () =>
         {
             underPause = true;
